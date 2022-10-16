@@ -1,11 +1,12 @@
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class _2048 {
     //note-to-self: boards will always need to be nxn moving forward. Which is totally fine with me lol
     private int[][] board;
-    private int[][] prev_board;
+    private boolean boardChanged = false;
     private boolean debugWanted = false;
     public _2048() {
 
@@ -50,8 +51,9 @@ public class _2048 {
             }
             makeMove(move);
             //if the board hasn't changed, then we don't want to add new values. You have to contribute something before we give you something.
-            if(prev_board != null && !prev_board.equals(board)) {
+            if(boardChanged) {
                 addValues(1);
+                boardChanged = false;
             }
 
 //            System.out.println(this.getBoardString());
@@ -65,9 +67,9 @@ public class _2048 {
      * @return the updated board
      */
     public int[][] makeMove(String move) {
-        //a simpler reference to the board
-        prev_board = board.clone();
 
+
+        //a simpler reference to the board
         int[][] b = board;
 
         int innerDirection = (move.equals("s") || move.equals("d")) ? -1 : 1;
@@ -157,7 +159,7 @@ public class _2048 {
 
             b[otherIndex][from] = 0;
         }
-
+        boardChanged = true;
         return b;
     }
 
