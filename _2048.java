@@ -1,9 +1,10 @@
-import java.lang.reflect.Array;
+
 import java.util.Scanner;
 
 public class _2048 {
     //note-to-self: boards will always need to be nxn moving forward. Which is totally fine with me lol
     private int[][] board;
+    private int[][] prev_board;
     private boolean debugWanted = false;
     public _2048() {
 
@@ -25,7 +26,7 @@ public class _2048 {
     }
     public void addValues(int qty) {
         for(int i = 0; i < qty; i++) {
-            int y = 0, x = 0;
+            int y, x;
             do {
                 y = (int) Math.floor(Math.random() * 4);
                 x = (int) Math.floor(Math.random() * 4);
@@ -35,11 +36,10 @@ public class _2048 {
     }
     //a wrapper method to handle an ongoing game in the console
     public void begin() {
-
         board = new int[][]{{1, 0, 0, 0},
-                            {0, 0, 0, 0},
-                            {1, 0, 0, 0},
-                            {2, 0, 0, 0}};
+                            {2, 0, 0, 0},
+                            {3, 0, 0, 0},
+                            {4, 0, 0, 0}};
         while(doesNotExist2048()) {
             System.out.println(this.getBoardString());
             String move = getNextMove().trim();
@@ -48,7 +48,10 @@ public class _2048 {
                 continue;
             }
             makeMove(move);
-            //addValues(1);
+            //if the board hasn't changed, then we don't want to add new values. You have to contribute something before we give you something.
+            if(prev_board != null && !prev_board.equals(board)) {
+                addValues(1);
+            }
         }
     }
 
@@ -59,6 +62,8 @@ public class _2048 {
      */
     public int[][] makeMove(String move) {
         //a simpler reference to the board
+        prev_board = board.clone();
+
         int[][] b = board;
 
         int innerDirection = (move.equals("s") || move.equals("d")) ? -1 : 1;
@@ -76,19 +81,23 @@ public class _2048 {
 
                     if (!compareBoardValues(b, i, o, 0, move, true)) {
                         //move back. j is our target index
-                        for (j = i - innerDirection; 0 <= j && j < b.length; j -= innerDirection) {
+                        j = i - innerDirection;
+                        for (; 0 <= j && j < b.length; j -= innerDirection) {
                             //if we are at the beginning of the array and the value here is not 0, then we can just move it up.
                             if ((j == 0 || j == b.length - 1) && compareBoardValues(b, j, o, 0, move, true)) {
                                 moveInDirection(b, i, j, o, move);
+                                break;
                             }
                             //until we find a thing
                             if (!compareBoardValues(b, j, o, 0, move, true)) {
                                 //if they're the same, then we need to merge the things
                                 if (compareBoardValues(b, i, o, j, move, false)) {
                                     moveInDirection(b, i, j, o, move);
+                                    break;
                                 } else if (i != j + innerDirection) { //if not, then we just move i up to the next empty spot.
                                     //if we're just moving it to the same location then we don't need to do anything
                                     moveInDirection(b, i, j + innerDirection, o, move);
+                                    break;
                                 }
                             }
                             //there may be things we don't want to move twice?
@@ -103,6 +112,8 @@ public class _2048 {
                 System.out.println(element.toString());
             }
         }
+
+        board = b;
 
         return b;
     }
