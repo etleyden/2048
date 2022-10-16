@@ -36,10 +36,10 @@ public class _2048 {
     }
     //a wrapper method to handle an ongoing game in the console
     public void begin() {
-        board = new int[][]{{1, 0, 0, 0},
-                            {2, 0, 0, 0},
-                            {3, 0, 0, 0},
-                            {4, 0, 0, 0}};
+//        board = new int[][]{{0, 0, 0, 3},
+//                            {0, 0, 0, 1},
+//                            {0, 0, 0, 3},
+//                            {0, 0, 0, 5}};
         while(doesNotExist2048()) {
             System.out.println(this.getBoardString());
             String move = getNextMove().trim();
@@ -52,6 +52,9 @@ public class _2048 {
             if(prev_board != null && !prev_board.equals(board)) {
                 addValues(1);
             }
+
+//            System.out.println(this.getBoardString());
+//            break;
         }
     }
 
@@ -93,12 +96,11 @@ public class _2048 {
                                 //if they're the same, then we need to merge the things
                                 if (compareBoardValues(b, i, o, j, move, false)) {
                                     moveInDirection(b, i, j, o, move);
-                                    break;
-                                } else if (i != j + innerDirection) { //if not, then we just move i up to the next empty spot.
+                                } else if (i != j + innerDirection && compareBoardValues(b, j + innerDirection, o, 0, move, true)) { //if not, then we just move i up to the next empty spot.
                                     //if we're just moving it to the same location then we don't need to do anything
                                     moveInDirection(b, i, j + innerDirection, o, move);
-                                    break;
                                 }
+                                break;
                             }
                             //there may be things we don't want to move twice?
                             //i = j;
@@ -187,7 +189,7 @@ public class _2048 {
         String validInputs = "wasdn";
         while(!inputValid) {
             System.out.print("Next move: ");
-            input = in.nextLine();
+            input = in.nextLine().trim().toLowerCase();
             if(input.length() == 1 && validInputs.indexOf(input) >= 0) inputValid = true;
         }
         return input;
